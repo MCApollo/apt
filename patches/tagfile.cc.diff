@@ -1,0 +1,10 @@
+--- apt-1.4.8/apt-pkg/tagfile.cc	2017-09-13 11:47:33.000000000 -0500
++++ apt-sileo/apt-pkg/tagfile.cc	2018-12-25 23:31:59.389765141 -0600
+@@ -622,6 +622,7 @@
+    for (; Stop > Section + 2 && (Stop[-2] == '\n' || Stop[-2] == '\r'); Stop--);
+ }
+ 									/*}}}*/
++
+ // TagSection::Exists - return True if a tag exists			/*{{{*/
+ bool pkgTagSection::Exists(StringView Tag) const
+ {

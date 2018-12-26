@@ -1,0 +1,22 @@
+--- apt-1.4.8/apt-pkg/acquire.cc	2017-09-13 11:47:33.000000000 -0500
++++ apt-sileo/apt-pkg/acquire.cc	2018-12-25 23:31:59.365765004 -0600
+@@ -474,13 +474,16 @@
+    // Create the new config class
+    Conf = new MethodConfig;
+    Conf->Access = Access;
+-   Conf->Next = Configs;
+-   Configs = Conf;
+ 
+    // Create the worker to fetch the configuration
+    Worker Work(Conf);
+    if (Work.Start() == false)
+-      return 0;
++   {
++      delete Conf;
++      return nullptr;
++   }
++   Conf->Next = Configs;
++   Configs = Conf;
+ 
+    /* if a method uses DownloadLimit, we switch to SingleInstance mode */
+    if(_config->FindI("Acquire::"+Access+"::Dl-Limit",0) > 0)

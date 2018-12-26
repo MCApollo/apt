@@ -1,0 +1,11 @@
+--- apt-1.4.8/apt-pkg/contrib/hashes.cc	2017-09-13 11:47:33.000000000 -0500
++++ apt-sileo/apt-pkg/contrib/hashes.cc	2018-12-25 23:31:59.373765050 -0600
+@@ -141,8 +141,6 @@
+ {
+    return (
+       (Type != "Checksum-FileSize") &&
+-      (Type != "MD5Sum") &&
+-      (Type != "SHA1") &&
+       !IsConfigured(Type.c_str(), "Untrusted")
+    );
+ }

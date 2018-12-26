@@ -1,0 +1,117 @@
+Context for some commits, even though you can see them by running `git log`
+
+commit 465cd53ac7a3bf5a1c24a83506e89fd13a26a78b
+Author: CoolStar <coolstarorganization@gmail.com>
+Date:   Wed May 23 11:41:58 2018 -0700
+
+    Backwards compatibility patches for Cydia repos
+
+commit e1ca48b923ce6ea94f55ca9a239d447c7ada285b
+Author: CoolStar <coolstarorganization@gmail.com>
+Date:   Thu May 10 17:19:42 2018 -0700
+
+    Treat SHA1 as Weak rather than untrusted. Add hardcoded exceptions for Modmyi/Zodttd/Bigboss to silence errors
+
+commit c41861467acf59c9a67770177ac8a87714fb502f
+Author: CoolStar <coolstarorganization@gmail.com>
+Date:   Thu May 10 17:13:03 2018 -0700
+
+    Forcibly remove LZ4
+
+commit 1747826dd59c80e502a3e1a8be0a5cdc3daa83d4
+Author: CoolStar <coolstarorganization@gmail.com>
+Date:   Thu May 10 16:08:35 2018 -0700
+
+    Fix system() in test_fileutl
+
+commit ad5b31684505582a10522c0e4a5243dcbd513d8f
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Thu Feb 8 20:09:06 2018 -0600
+
+    build changes to work with our new http
+
+commit 8a53ea76df784d4ce23804014dd83dc6dea5ab94
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Wed Feb 7 23:59:28 2018 -0600
+
+    Added kirb's TLS1.2 patch
+
+commit ce2ec8b640f6a730cf76abcb54f26839535e450e
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Tue Feb 6 17:47:38 2018 -0600
+
+    Build system changes
+
+commit 6fdf4785aaab22bbde11cfaa44b02066b1b1c191
+Author: CoolStar <coolstarorganization@gmail.com>
+Date:   Thu May 10 15:02:12 2018 -0700
+
+    Fix merge issue
+
+commit 279fcffa85a6e2a0c0bfe5f0041d0fb2d6cee2d8
+Author: CoolStar <coolstarorganization@gmail.com>
+Date:   Thu May 10 15:00:46 2018 -0700
+
+    Use system() fix in cdromutl to get it to build (even though we don't use it)
+
+commit e6206928f8c4b06da490fb884f826a72c52b1a37
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Wed Feb 7 17:01:37 2018 -0600
+
+    Lets get those sizes right
+
+commit 5ebe08e895b9f075f39f54162b989b1ceefe4e18
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Wed Feb 7 01:52:36 2018 -0600
+
+    Reverting to kb's gpgv version for now
+
+commit f329551d06a27a6c7deaefb46a76aa65031e1aeb
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Wed Feb 7 01:42:06 2018 -0600
+
+    Fixed last few errors. APT is strict...
+
+commit dd27483246ebb4fe3a1b39c727d781e82702bdc4
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Wed Feb 7 00:15:24 2018 -0600
+
+    Missed a semicolon
+
+commit 703a2c63bafe01aa7a3974edc0090ef24e2077d6
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Tue Feb 6 23:51:41 2018 -0600
+
+    Fixed system() using coolstar's patch and added other required patches
+
+commit cc1522b65a75d703e1b69cb0a6882a5695cac513
+Author: Jaywalker <jwilliams@nsllc.com>
+Date:   Tue Feb 6 17:48:39 2018 -0600
+
+    Added seemingly missing files
+
+commit 9d1d8250f77543933e52786690502f998c4adf17
+Author: CoolStar <coolstarorganization@gmail.com>
+Date:   Thu May 10 14:29:51 2018 -0700
+
+    Don't build doc
+
+commit 281dbc8e481fbaeaf7310e0800468d4d212711b8
+Author: David Kalnischkies <david@kalnischkies.de>
+Date:   Fri Aug 4 12:51:34 2017 +0200
+
+    don't hang if multiple sources use unavailable method
+    
+    APT clients always noticed if a method isn't supported and nowadays
+    generate a message of the form:
+            E: The method driver …/foobar could not be found.
+            N: Is the package apt-transport-foobar installed?
+    
+    This only worked if a single source was using such an unavailable method
+    through as we were registering the failed config the first round and
+    the second would try to send requests to the not started method, which
+    wouldn't work and hang instead (+ hiding the error messages as they would
+    be shown only at the end of the execution).
+    
+    Closes: 870675
+    (cherry picked from commit e250a8d8d8ef2f8f8c5e2041f7645c49fba7aa36)

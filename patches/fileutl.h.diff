@@ -1,0 +1,11 @@
+--- apt-1.4.8/apt-pkg/contrib/fileutl.h	2017-09-13 11:47:33.000000000 -0500
++++ apt-sileo/apt-pkg/contrib/fileutl.h	2018-12-25 23:31:59.373765050 -0600
+@@ -158,6 +158,8 @@
+    APT_HIDDEN bool FileFdError(const char* Description,...) APT_PRINTF(2) APT_COLD;
+ };
+ 
++
++int RunCmd(const char *Cmd);
+ bool RunScripts(const char *Cnf);
+ bool CopyFile(FileFd &From,FileFd &To);
+ bool RemoveFile(char const * const Function, std::string const &FileName);

@@ -1,0 +1,11 @@
+--- apt-1.4.8/ftparchive/byhash.cc	2017-09-13 11:47:33.000000000 -0500
++++ apt-sileo/ftparchive/byhash.cc	2018-12-25 23:31:59.453765505 -0600
+@@ -17,6 +17,8 @@
+ #include <unistd.h>
+ #include <sys/stat.h>
+ 
++#define st_mtim st_mtimespec
++
+ #include <apt-pkg/fileutl.h>
+ #include <apt-pkg/hashes.h>
+ #include "byhash.h"

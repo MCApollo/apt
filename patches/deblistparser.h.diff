@@ -1,0 +1,11 @@
+--- apt-1.4.8/apt-pkg/deb/deblistparser.h	2017-09-13 11:47:33.000000000 -0500
++++ apt-sileo/apt-pkg/deb/deblistparser.h	2018-12-25 23:31:59.377765073 -0600
+@@ -52,6 +52,8 @@
+    pkgTagSection Section;
+    map_filesize_t iOffset;
+ 
++   std::string Arch;
++
+    virtual bool ParseStatus(pkgCache::PkgIterator &Pkg,pkgCache::VerIterator &Ver);
+    bool ParseDepends(pkgCache::VerIterator &Ver, pkgTagSection::Key Key,
+ 		     unsigned int Type);
