@@ -1,0 +1,20 @@
+--- apt-1.7.0/apt-pkg/contrib/cdromutl.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/contrib/cdromutl.cc	2018-12-25 23:53:03.051945353 -0600
+@@ -98,7 +98,7 @@
+ 
+ 	 if (_config->Exists("Acquire::cdrom::"+Path+"::UMount") == true)
+ 	 {
+-	    if (system(_config->Find("Acquire::cdrom::"+Path+"::UMount").c_str()) != 0)
++	    if (RunCmd(_config->Find("Acquire::cdrom::"+Path+"::UMount").c_str()) != 0)
+ 	       _exit(100);
+ 	    _exit(0);	 	 
+ 	 }
+@@ -149,7 +149,7 @@
+ 
+       if (_config->Exists("Acquire::cdrom::"+Path+"::Mount") == true)
+       {
+-	 if (system(_config->Find("Acquire::cdrom::"+Path+"::Mount").c_str()) != 0)
++	 if (RunCmd(_config->Find("Acquire::cdrom::"+Path+"::Mount").c_str()) != 0)
+ 	    _exit(100);
+ 	 _exit(0);	 
+       }

@@ -1,0 +1,10 @@
+--- apt-1.7.0/apt-pkg/contrib/string_view.h	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/contrib/string_view.h	2018-12-25 23:53:03.055945371 -0600
+@@ -12,6 +12,7 @@
+ #if !defined(APT_STRINGVIEW_H) && defined(APT_PKG_EXPOSE_STRING_VIEW)
+ #define APT_STRINGVIEW_H
+ #include <apt-pkg/macros.h>
++#include <apt-pkg/missing.h>
+ #include <string>
+ #include <string.h>
+ 

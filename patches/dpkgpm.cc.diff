@@ -1,0 +1,20 @@
+--- apt-1.7.0/apt-pkg/deb/dpkgpm.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/deb/dpkgpm.cc	2018-12-25 23:53:03.059945389 -0600
+@@ -1714,7 +1714,7 @@
+    bool dpkgMultiArch = debSystem::SupportsMultiArch();
+ 
+    // start pty magic before the loop
+-   StartPtyMagic();
++   //StartPtyMagic(); or not...
+ 
+    // Tell the progress that its starting and fork dpkg
+    d->progress->Start(d->master);
+@@ -2131,7 +2131,7 @@
+       }
+    }
+    // dpkg is done at this point
+-   StopPtyMagic();
++   //StopPtyMagic();
+    CloseLog();
+ 
+    if (d->dpkg_error.empty() == false)

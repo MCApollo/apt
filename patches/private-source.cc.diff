@@ -1,0 +1,20 @@
+--- apt-1.7.0/apt-private/private-source.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-private/private-source.cc	2018-12-25 23:53:03.075945462 -0600
+@@ -519,7 +519,7 @@
+ 	 strprintf(S, "%s %s %s",
+ 	       _config->Find("Dir::Bin::dpkg-source","dpkg-source").c_str(),
+ 	       sourceopts.c_str(), D.Dsc.c_str());
+-	 if (system(S.c_str()) != 0)
++	 if (RunCmd(S.c_str()) != 0)
+ 	 {
+ 	    _error->Error(_("Unpack command '%s' failed.\n"), S.c_str());
+ 	    if (SaidCheckIfDpkgDev == false)
+@@ -552,7 +552,7 @@
+ 	       _config->Find("Dir::Bin::dpkg-buildpackage","dpkg-buildpackage").c_str(),
+ 	       buildopts.c_str());
+ 
+-	 if (system(S.c_str()) != 0)
++	 if (RunCmd(S.c_str()) != 0)
+ 	 {
+ 	    _error->Error(_("Build command '%s' failed.\n"), S.c_str());
+ 	    continue;

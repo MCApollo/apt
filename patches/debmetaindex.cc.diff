@@ -1,0 +1,28 @@
+--- apt-1.7.0/apt-pkg/deb/debmetaindex.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/deb/debmetaindex.cc	2018-12-25 23:53:03.055945371 -0600
+@@ -472,11 +472,12 @@
+    }
+ 
+    bool AuthPossible = false;
+-   if(FoundHashSum == false)
++   /*if(FoundHashSum == false)
+       _error->Warning(_("No Hash entry in Release file %s"), Filename.c_str());
+    else if(FoundStrongHashSum == false)
+       _error->Warning(_("No Hash entry in Release file %s which is considered strong enough for security purposes"), Filename.c_str());
+-   else
++   else*/
++   if (FoundHashSum && FoundStrongHashSum)
+       AuthPossible = true;
+ 
+    std::string const StrDate = Section.FindS("Date");
+@@ -514,6 +515,10 @@
+ 
+       if (CheckValidUntil == true)
+       {
++
++      	if (Date == 0)
++      		strprintf(*ErrorText, _("Invalid '%s' entry in Release file %s"), "Date", Filename.c_str());
++
+ 	 std::string const StrValidUntil = Section.FindS("Valid-Until");
+ 
+ 	 // if we have a Valid-Until header in the Release file, use it as default

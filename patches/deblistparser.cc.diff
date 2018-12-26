@@ -1,0 +1,10 @@
+--- apt-1.7.0/apt-pkg/deb/deblistparser.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/deb/deblistparser.cc	2018-12-25 23:53:03.055945371 -0600
+@@ -61,6 +61,7 @@
+    else
+       forceEssential.emplace_back("apt");
+    forceImportant = _config->FindVector("pkgCacheGen::ForceImportant");
++   Arch = _config->Find("APT::architecture");
+ }
+ 									/*}}}*/
+ // ListParser::Package - Return the package name			/*{{{*/

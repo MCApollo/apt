@@ -1,0 +1,11 @@
+--- apt-1.7.0/test/interactive-helper/test_fileutl.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/test/interactive-helper/test_fileutl.cc	2018-12-25 23:53:03.179945933 -0600
+@@ -14,7 +14,7 @@
+ 
+ static void callsystem(std::string const &call)
+ {
+-   auto ret = system(call.c_str());
++   auto ret = RunCmd(call.c_str());
+    if (WIFEXITED(ret) == false || WEXITSTATUS(ret) != 0)
+       _error->Error("Calling %s failed!", call.c_str());
+ }

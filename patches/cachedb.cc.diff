@@ -1,0 +1,10 @@
+--- apt-1.7.0/ftparchive/cachedb.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/ftparchive/cachedb.cc	2018-12-25 23:53:03.127945697 -0600
+@@ -21,6 +21,7 @@
+ #include <apt-pkg/sha1.h>
+ #include <apt-pkg/sha2.h>
+ #include <apt-pkg/strutl.h>
++#include <apt-pkg/missing.h>
+ 
+ #include <ctype.h>
+ #include <netinet/in.h> // htonl, etc

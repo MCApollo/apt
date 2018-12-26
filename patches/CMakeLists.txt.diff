@@ -1,0 +1,37 @@
+--- apt-1.7.0/cmdline/CMakeLists.txt	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/cmdline/CMakeLists.txt	2018-12-25 23:53:03.075945462 -0600
+@@ -9,6 +9,7 @@
+ add_executable(apt-sortpkgs apt-sortpkgs.cc)
+ add_executable(apt-extracttemplates apt-extracttemplates.cc)
+ add_executable(apt-internal-solver apt-internal-solver.cc)
++add_executable(sileo-solver sileo-solver.cc)
+ add_executable(apt-dump-solver apt-dump-solver.cc)
+ add_executable(apt-internal-planner apt-internal-planner.cc)
+ add_vendor_file(OUTPUT apt-key
+@@ -31,6 +32,7 @@
+ target_link_libraries(apt-sortpkgs apt-pkg apt-private)
+ target_link_libraries(apt-extracttemplates apt-pkg apt-inst apt-private)
+ target_link_libraries(apt-internal-solver apt-pkg apt-inst apt-private)
++target_link_libraries(sileo-solver apt-pkg apt-inst apt-private)
+ target_link_libraries(apt-dump-solver apt-pkg apt-inst apt-private)
+ target_link_libraries(apt-internal-planner apt-pkg apt-inst apt-private)
+ 
+@@ -40,6 +42,9 @@
+ set_target_properties(apt-internal-solver
+                       PROPERTIES RUNTIME_OUTPUT_DIRECTORY solvers
+                                  RUNTIME_OUTPUT_NAME apt)
++set_target_properties(sileo-solver
++                      PROPERTIES RUNTIME_OUTPUT_DIRECTORY solvers
++                                 RUNTIME_OUTPUT_NAME sileo)
+ set_target_properties(apt-internal-planner
+                       PROPERTIES RUNTIME_OUTPUT_DIRECTORY planners
+                                  RUNTIME_OUTPUT_NAME apt)
+@@ -50,7 +55,7 @@
+         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ install(TARGETS apt-helper RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/)
+-install(TARGETS apt-dump-solver apt-internal-solver RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/solvers)
++install(TARGETS apt-dump-solver apt-internal-solver sileo-solver RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/solvers)
+ install(TARGETS apt-internal-planner RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/planners)
+ 
+ add_slaves(${CMAKE_INSTALL_LIBEXECDIR}/apt/planners ../solvers/dump planners/dump)

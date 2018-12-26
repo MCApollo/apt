@@ -1,0 +1,206 @@
+--- apt-1.7.0/apt-pkg/algorithms.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/algorithms.cc	2018-12-25 23:53:03.047945335 -0600
+@@ -73,6 +73,32 @@
+    Parameter Candidate == true displays the candidate package version */
+ void pkgSimulate::Describe(PkgIterator Pkg,ostream &out,bool Current,bool Candidate)
+ {
++   bool forSileo = _config->FindB("APT::Format::for-sileo", false);
++   if (forSileo){
++      VerIterator Ver(Sim);
++ 
++      out << "\"Package\":\"" << Pkg.FullName(true) << "\"";
++
++      if (Current == true)
++      {
++         Ver = Pkg.CurrentVer();
++         if (Ver.end() == false)
++            out << ",\"Version\":\"" << Ver.VerStr() << '"';
++      }
++
++      if (Candidate == true)
++      {
++         Ver = Sim[Pkg].CandidateVerIter(Sim);
++         if (Ver.end() == true)
++            return;
++      
++         out << ",\"Version\":\"" << Ver.VerStr() << '"';
++         out << ",\"Release\":\"" << Ver.RelStr() << '"';
++      }
++      out << "}";
++      return;
++   }
++
+    VerIterator Ver(Sim);
+  
+    out << Pkg.FullName(true);
+@@ -106,6 +132,47 @@
+ }
+ bool pkgSimulate::RealInstall(PkgIterator iPkg,string /*File*/)
+ {
++   bool forSileo = _config->FindB("APT::Format::for-sileo", false);
++   if (forSileo){
++      // Adapt the iterator
++      PkgIterator Pkg = Sim.FindPkg(iPkg.Name(), iPkg.Arch());
++      Flags[Pkg->ID] = 1;
++      
++      cout << "{\"Type\":\"Inst\",";
++      Describe(Pkg,cout,true,true);
++      Sim.MarkInstall(Pkg,false);
++
++      // Look for broken conflicts+predepends.
++      for (PkgIterator I = Sim.PkgBegin(); I.end() == false; ++I)
++      {
++         if (Sim[I].InstallVer == 0)
++       continue;
++         
++         for (DepIterator D = Sim[I].InstVerIter(Sim).DependsList(); D.end() == false;)
++         {
++       DepIterator Start;
++       DepIterator End;
++       D.GlobOr(Start,End);
++       if (Start.IsNegative() == true ||
++           End->Type == pkgCache::Dep::PreDepends)
++            {
++          if ((Sim[End] & pkgDepCache::DepGInstall) == 0)
++          {
++             cout << " [" << I.FullName(false) << " on " << Start.TargetPkg().FullName(false) << ']';
++             if (Start->Type == pkgCache::Dep::Conflicts)
++           _error->Error("Fatal, conflicts violated %s",I.FullName(false).c_str());
++          }     
++       }
++         }      
++      }
++
++      if (Sim.BrokenCount() != 0)
++         ShortBreaks();
++      else
++         cout << endl;
++      return true;
++   }
++
+    // Adapt the iterator
+    PkgIterator Pkg = Sim.FindPkg(iPkg.Name(), iPkg.Arch());
+    Flags[Pkg->ID] = 1;
+@@ -159,46 +226,49 @@
+ }
+ bool pkgSimulate::RealConfigure(PkgIterator iPkg)
+ {
++   bool forSileo = _config->FindB("APT::Format::for-sileo", false);
+    // Adapt the iterator
+    PkgIterator Pkg = Sim.FindPkg(iPkg.Name(), iPkg.Arch());
+    
+    Flags[Pkg->ID] = 2;
+ 
+-   if (Sim[Pkg].InstBroken() == true)
+-   {
+-      cout << "Conf " << Pkg.FullName(false) << " broken" << endl;
+-
+-      Sim.Update();
+-      
+-      // Print out each package and the failed dependencies
+-      for (pkgCache::DepIterator D = Sim[Pkg].InstVerIter(Sim).DependsList(); D.end() == false; ++D)
++   if (!forSileo){
++      if (Sim[Pkg].InstBroken() == true)
+       {
+-	 if (Sim.IsImportantDep(D) == false || 
+-	     (Sim[D] & pkgDepCache::DepInstall) != 0)
+-	    continue;
+-	 
+-	 if (D->Type == pkgCache::Dep::Obsoletes)
+-	    cout << " Obsoletes:" << D.TargetPkg().FullName(false);
+-	 else if (D->Type == pkgCache::Dep::Conflicts)
+-	    cout << " Conflicts:" << D.TargetPkg().FullName(false);
+-	 else if (D->Type == pkgCache::Dep::DpkgBreaks)
+-	    cout << " Breaks:" << D.TargetPkg().FullName(false);
+-	 else
+-	    cout << " Depends:" << D.TargetPkg().FullName(false);
+-      }	    
+-      cout << endl;
++         cout << "Conf " << Pkg.FullName(false) << " broken" << endl;
+ 
+-      _error->Error("Conf Broken %s",Pkg.FullName(false).c_str());
+-   }   
+-   else
+-   {
+-      cout << "Conf "; 
+-      Describe(Pkg,cout,false,true);
++         Sim.Update();
++         
++         // Print out each package and the failed dependencies
++         for (pkgCache::DepIterator D = Sim[Pkg].InstVerIter(Sim).DependsList(); D.end() == false; ++D)
++         {
++   	 if (Sim.IsImportantDep(D) == false || 
++   	     (Sim[D] & pkgDepCache::DepInstall) != 0)
++   	    continue;
++   	 
++   	 if (D->Type == pkgCache::Dep::Obsoletes)
++   	    cout << " Obsoletes:" << D.TargetPkg().FullName(false);
++   	 else if (D->Type == pkgCache::Dep::Conflicts)
++   	    cout << " Conflicts:" << D.TargetPkg().FullName(false);
++   	 else if (D->Type == pkgCache::Dep::DpkgBreaks)
++   	    cout << " Breaks:" << D.TargetPkg().FullName(false);
++   	 else
++   	    cout << " Depends:" << D.TargetPkg().FullName(false);
++         }	    
++         cout << endl;
++
++         _error->Error("Conf Broken %s",Pkg.FullName(false).c_str());
++      }   
++      else
++      {
++         cout << "Conf "; 
++         Describe(Pkg,cout,false,true);
++      }
+    }
+ 
+    if (Sim.BrokenCount() != 0)
+       ShortBreaks();
+-   else
++   else if (!forSileo)
+       cout << endl;
+    
+    return true;
+@@ -216,6 +286,8 @@
+ }
+ bool pkgSimulate::RealRemove(PkgIterator iPkg,bool Purge)
+ {
++   bool forSileo = _config->FindB("APT::Format::for-sileo", false);
++   
+    // Adapt the iterator
+    PkgIterator Pkg = Sim.FindPkg(iPkg.Name(), iPkg.Arch());
+    if (Pkg.end() == true)
+@@ -227,16 +299,27 @@
+    Flags[Pkg->ID] = 3;
+    Sim.MarkDelete(Pkg);
+ 
+-   if (Purge == true)
+-      cout << "Purg ";
+-   else
+-      cout << "Remv ";
++   if (forSileo){
++      if (Purge == true)
++         cout << "{\"Type\":\"Purg\",";
++      else
++         cout << "{\"Type\":\"Remv\",";
++   } else {
++      if (Purge == true)
++         cout << "Purg ";
++      else
++         cout << "Remv ";
++   }
+    Describe(Pkg,cout,true,false);
+ 
+-   if (Sim.BrokenCount() != 0)
+-      ShortBreaks();
+-   else
++   if (!forSileo){
++      if (Sim.BrokenCount() != 0)
++         ShortBreaks();
++      else
++         cout << endl;
++   } else {
+       cout << endl;
++   }
+ 
+    return true;
+ }

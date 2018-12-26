@@ -1,0 +1,13 @@
+--- apt-1.7.0/apt-pkg/indexfile.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/indexfile.cc	2018-12-25 23:53:03.063945407 -0600
+@@ -203,6 +203,10 @@
+ 									/*}}}*/
+ std::string pkgDebianIndexTargetFile::ArchiveURI(std::string const &File) const/*{{{*/
+ {
++   std::string httpprefix = "http://";
++   std::string httpsprefix = "https://";
++   if (File.substr(0, httpprefix.size()) == httpprefix || File.substr(0, httpsprefix.size()) == httpsprefix)
++      return File;
+    return Target.Option(IndexTarget::REPO_URI) + File;
+ }
+ 									/*}}}*/

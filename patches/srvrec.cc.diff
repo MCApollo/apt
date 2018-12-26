@@ -1,0 +1,10 @@
+--- apt-1.7.0/apt-pkg/contrib/srvrec.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/contrib/srvrec.cc	2018-12-25 23:53:03.055945371 -0600
+@@ -11,6 +11,7 @@
+ #include <netdb.h>
+ 
+ #include <arpa/nameser.h>
++#include <apt-pkg/nameser_compat.h>
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
+ #include <resolv.h>

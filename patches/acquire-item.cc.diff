@@ -1,0 +1,33 @@
+--- apt-1.7.0/apt-pkg/acquire-item.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/acquire-item.cc	2018-12-25 23:53:03.043945317 -0600
+@@ -256,7 +256,7 @@
+ 
+    if (TargetIsAllowedToBe(TransactionManager->Target, msg) == true)
+    {
+-      MessageInsecureRepository(false, msgstr, repo);
++      //MessageInsecureRepository(false, msgstr, repo);
+       return true;
+    }
+ 
+@@ -1595,7 +1595,7 @@
+ 	    }
+ 
+ 	    // optional targets that we do not have in the Release file are skipped
+-	    if (hasHashes == true && Target.IsOptional)
++	    if (Target.IsOptional)
+ 	    {
+ 	       new CleanupItem(Owner, TransactionManager, Target);
+ 	       continue;
+@@ -1711,6 +1711,12 @@
+       }
+       else
+       {
++
++         if (Target.IsOptional){
++            new CleanupItem(Owner, TransactionManager, Target);
++            continue;
++         }
++
+ 	 // if we have no file to patch, no point in trying
+ 	 trypdiff &= (GetExistingFilename(GetFinalFileNameFromURI(Target.URI)).empty() == false);
+       }

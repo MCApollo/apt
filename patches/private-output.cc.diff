@@ -1,0 +1,197 @@
+--- apt-1.7.0/apt-private/private-output.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-private/private-output.cc	2018-12-25 23:53:03.075945462 -0600
+@@ -328,17 +328,126 @@
+            Depends: libldap2 (>= 2.0.2-2) but it is not going to be installed
+            Depends: libsasl7 but it is not going to be installed
+  */
+-static void ShowBrokenPackage(ostream &out, pkgCacheFile * const Cache, pkgCache::PkgIterator const &Pkg, bool const Now)
++static bool ShowBrokenPackage(ostream &out, pkgCacheFile * const Cache, pkgCache::PkgIterator const &Pkg, bool const Now, bool const DisplaySeparator)
+ {
+    if (Now == true)
+    {
+       if ((*Cache)[Pkg].NowBroken() == false)
+-	 return;
++	 return false;
+    }
+    else
+    {
+       if ((*Cache)[Pkg].InstBroken() == false)
+-	 return;
++	 return false;
++   }
++
++   bool useJSON = _config->FindB("APT::Format::for-sileo", false);
++   if (useJSON){
++      if (DisplaySeparator)
++         out << ",";
++
++      // Print out each package and the failed dependencies
++      out << "\"" << Pkg.FullName(true) << "\":[";
++      bool First = true;
++      pkgCache::VerIterator Ver;
++
++      if (Now == true)
++         Ver = Pkg.CurrentVer();
++      else
++         Ver = (*Cache)[Pkg].InstVerIter(*Cache);
++
++      if (Ver.end() == true)
++      {
++         out << "]" << endl;
++         return true;
++      }
++
++      for (pkgCache::DepIterator D = Ver.DependsList(); D.end() == false;)
++      {
++         // Compute a single dependency element (glob or)
++         pkgCache::DepIterator Start;
++         pkgCache::DepIterator End;
++         D.GlobOr(Start,End); // advances D
++
++         if ((*Cache)->IsImportantDep(End) == false)
++            continue;
++
++         if (Now == true)
++         {
++            if (((*Cache)[End] & pkgDepCache::DepGNow) == pkgDepCache::DepGNow)
++               continue;
++         }
++         else
++         {
++            if (((*Cache)[End] & pkgDepCache::DepGInstall) == pkgDepCache::DepGInstall)
++               continue;
++         }
++
++         bool FirstOr = true;
++         while (1)
++         {
++            if (!First)
++               out << ",";
++
++            First = false;
++
++            if (FirstOr == false)
++            {
++               out << ",";
++            }
++            else
++               out << "[";
++            out << "{\"Type\":\"" << End.DepType() << "\"";
++            FirstOr = false;
++
++            out << ",\"Package\":\"" << Start.TargetPkg().FullName(true) << "\"";
++
++            // Show a quick summary of the version requirements
++            if (Start.TargetVer() != 0)
++               out << ",\"VersionSummary\":\"" << Start.CompType() << " " << Start.TargetVer() << "\"";
++
++            /* Show a summary of the target package if possible. In the case
++            of virtual packages we show nothing */
++            pkgCache::PkgIterator Targ = Start.TargetPkg();
++            if (Targ->ProvidesList == 0)
++            {
++               pkgCache::VerIterator Ver = (*Cache)[Targ].InstVerIter(*Cache);
++               if (Now == true)
++                  Ver = Targ.CurrentVer();
++
++                  if (Ver.end() == false)
++                  {
++                     if (Now == true)
++                        ioprintf(out,_(",\"Reason\":\"%s is installed\""),Ver.VerStr());
++                     else
++                        ioprintf(out,_(",\"Reason\":\"%s is to be installed\""),Ver.VerStr());
++                  }
++                  else
++                  {
++                     if ((*Cache)[Targ].CandidateVerIter(*Cache).end() == true)
++                     {
++                        if (Targ->ProvidesList == 0)
++                           out << _(",\"Reason\":\"it is not installable\"");
++                        else
++                           out << _(",\"Reason\":\"it is a virtual package\"");
++                     }
++                     else
++                        out << (Now?_(",\"Reason\":\"it is not installed\""):_(",\"Reason\":\"it is not going to be installed\""));
++                  }
++            }
++
++            out << "}";
++
++            if (Start == End){
++               out << "]";
++               break;
++            }
++            ++Start;
++         }
++      }
++      out << "]";
++
++      return true;
+    }
+ 
+    // Print out each package and the failed dependencies
+@@ -355,7 +464,7 @@
+    if (Ver.end() == true)
+    {
+       out << endl;
+-      return;
++      return true;
+    }
+ 
+    for (pkgCache::DepIterator D = Ver.DependsList(); D.end() == false;)
+@@ -442,6 +551,7 @@
+ 	 ++Start;
+       }
+    }
++   return true;
+ }
+ void ShowBroken(ostream &out, CacheFile &Cache, bool const Now)
+ {
+@@ -449,9 +559,21 @@
+       return;
+ 
+    out << _("The following packages have unmet dependencies:") << endl;
++
++   bool useJSON = _config->FindB("APT::Format::for-sileo", false);
++   if (useJSON)
++      out << "{";
++
++   bool DisplaySeparator = false;
++
+    SortedPackageUniverse Universe(Cache);
+-   for (auto const &Pkg: Universe)
+-      ShowBrokenPackage(out, &Cache, Pkg, Now);
++   for (auto const &Pkg: Universe){
++      if (ShowBrokenPackage(out, &Cache, Pkg, Now, DisplaySeparator))
++         DisplaySeparator = true;
++   }
++
++   if (useJSON)
++      out << "}";
+ }
+ void ShowBroken(ostream &out, pkgCacheFile &Cache, bool const Now)
+ {
+@@ -459,9 +581,21 @@
+       return;
+ 
+    out << _("The following packages have unmet dependencies:") << endl;
++
++   bool useJSON = _config->FindB("APT::Format::for-sileo", false);
++   if (useJSON)
++      out << "{";
++
++   bool DisplaySeparator = false;
++
+    APT::PackageUniverse Universe(Cache);
+-   for (auto const &Pkg: Universe)
+-      ShowBrokenPackage(out, &Cache, Pkg, Now);
++   for (auto const &Pkg: Universe){
++      if (ShowBrokenPackage(out, &Cache, Pkg, Now, DisplaySeparator))
++         DisplaySeparator = true;
++   }
++
++   if (useJSON)
++      out << "}";
+ }
+ 									/*}}}*/
+ // ShowNew - Show packages to newly install				/*{{{*/

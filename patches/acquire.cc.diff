@@ -1,0 +1,11 @@
+--- apt-1.7.0/apt-pkg/acquire.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/acquire.cc	2018-12-25 23:53:03.047945335 -0600
+@@ -1262,7 +1262,7 @@
+    auto const Time = std::chrono::steady_clock::now().time_since_epoch();
+    auto const Time_sec = std::chrono::duration_cast<std::chrono::seconds>(Time);
+    auto const Time_usec = std::chrono::duration_cast<std::chrono::microseconds>(Time - Time_sec);
+-   return { Time_sec.count(), Time_usec.count() };
++   return { Time_sec.count(), static_cast<__darwin_suseconds_t>(Time_usec.count()) };
+ }
+ bool pkgAcquireStatus::Pulse(pkgAcquire *Owner)
+ {

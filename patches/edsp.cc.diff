@@ -1,0 +1,18 @@
+--- apt-1.7.0/apt-pkg/edsp.cc	2018-10-07 00:56:02.000000000 -0500
++++ apt-sileo/apt-pkg/edsp.cc	2018-12-25 23:53:03.059945389 -0600
+@@ -661,6 +661,15 @@
+ 				_error->Error("External solver failed with: %s", msg.substr(0,msg.find('\n')).c_str());
+ 			if (Progress != nullptr)
+ 				Progress->Done();
++
++         bool forSileo = _config->FindB("APT::Format::for-sileo", false);
++         if (forSileo){
++            std::cerr << "SOLVERR: " << section.FindS("Error") << std::endl;
++            std::cerr << "SOLVINFO:" << std::endl;
++            std::cerr << msg << std::endl << std::endl;
++            return false;
++         }
++         
+ 			std::cerr << "The solver encountered an error of type: " << section.FindS("Error") << std::endl;
+ 			std::cerr << "The following information might help you to understand what is wrong:" << std::endl;
+ 			std::cerr << msg << std::endl << std::endl;
